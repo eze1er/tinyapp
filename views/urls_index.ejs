@@ -27,7 +27,21 @@
   }
   
   .delete:hover {
+    background-color: #aa0404;
+    color: white;
+  }
+
+  /* Edit button blue  */
+    /* Delete button blue */
+    .edit {
+    border-color: #04AA6D;
+    color: blue;
+    
+  }
+  
+  .edit:hover {
     background-color: #04AA6D;
+
     color: white;
   }
 
@@ -57,7 +71,8 @@
           <tr>
             <td><%= url %></td>
             <td><%= urls[url] %> </td>    
-              <td><button class="btn delete" style="margin-left: 30px;">Delete</button></td>
+              <td><button class="btn edit" style="margin-left: 10px;">Edit</button>
+              <button class="btn delete" style="margin-left: 30px;">Delete</button></td>
             
             </tr>
         <% } %>
