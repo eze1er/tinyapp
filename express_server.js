@@ -5,6 +5,7 @@ const PORT = 8080; // default port 8080
 app.set("view engine", "ejs");
 // for us to be able to use POST
 const bodyParser = require("body-parser");
+const { text } = require("body-parser");
 app.use(bodyParser.urlencoded({extended: true}));
 
 const urlDatabase = {
@@ -52,32 +53,23 @@ app.get("/urls/:shortURL", (req, res) => {
   res.render("urls_show", templateVars);
 });
 
-app.post("/urls", (req, res) => {
-  // console.log(req.body);  // Log the POST request body to the console
-  console.log(req.body); 
-  res.send("Ok");         // Respond with 'Ok' (we will replace this)
-});
 
-
-function generateRandomString(body) {
-  // program to generate random strings
-  let text = '';
-  let xx = '';
+const generateRandomString = function() {
+  let randomString = "";
   for (let i = 0; i < 6; i++) {
-    xx = body.charAt(Math.floor(Math.random() * body.length));
-    if ((xx === ':') || (xx === '.') || (xx === '/') || (xx === ',')) {
-      i--;
-    } else {
-      text += xx;
-    }
-    
+    const randomCharCode = Math.floor(Math.random() * 26 + 97);
+    const randomChar = String.fromCharCode(randomCharCode);
+    randomString += randomChar;
   }
+  return randomString;
+};
 
-  console.log(text);
-  return text;
-}
-
-generateRandomString(urlDatabase.b2xVn2);
+app.post("/urls" , (req, res)  => {
+  const shortURL = generateRandomString();
+  const longURL = req.body.longURL;
+  urlDatabase[shortURL] = longURL;
+  res.redirect(`/urls/${shortURL}`);
+} )
 
 app.listen(PORT, () => {
   console.log(`Example app listening on port ${PORT}!`);
