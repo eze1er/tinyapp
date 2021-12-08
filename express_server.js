@@ -53,6 +53,7 @@ app.get("/urls/:shortURL", (req, res) => {
   res.render("urls_show", templateVars);
 });
 
+// generated the short url
 
 const generateRandomString = function() {
   let randomString = "";
@@ -69,12 +70,13 @@ app.post("/urls" , (req, res)  => {
   const longURL = req.body.longURL;
   urlDatabase[shortURL] = longURL;
   res.redirect(`/urls/${shortURL}`);
+  // res.redirect(`/urls/${shortURL}`);
 } )
   // Delete longURL when delete button is submitted
 app.post("/urls/:shortURL/delete", (req, res) => {
   const shortURL = req.params.shortURL;
   delete urlDatabase[shortURL];
-  res.redirect('/urls');
+  res.redirect(`/urls`);
 });
 
 app.listen(PORT, () => {

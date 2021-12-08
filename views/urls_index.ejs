@@ -37,7 +37,7 @@
 <body>
   
   <%- include('./partials/_header.ejs') %>
-  <form method="POST" action="/urls/9sm5xK/delete">...</form>
+  <form method="POST" action="/urls/9sm5xK/delete"></form>
 
   <main style="margin: 1em;">
     <h3>My URLs</h3>
@@ -46,14 +46,18 @@
         <tr>
           <th scope="col">Short URL</th>
           <th scope="col">Long URL</th>
+          <th scope="col"></th>
+          <th scope="col"></th>
+
         </tr>
       </thead>
+      
       <tbody>
         <% for(let url in urls) { %>
           <tr>
             <td><%= url %></td>
-            <td><%= urls[url] %>     
-              <button class="btn delete" style="margin-left: 10px;">Delete</button></td>
+            <td><%= urls[url] %> </td>    
+              <td><button class="btn delete" style="margin-left: 30px;">Delete</button></td>
             
             </tr>
         <% } %>
