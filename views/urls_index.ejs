@@ -7,12 +7,38 @@
   <!-- Bootstrap CSS -->
   <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/css/bootstrap.min.css" integrity="sha384-GJzZqFGwb1QTTN6wy59ffF1BuGJpLSa9DkKMp0DgiMDm4iYMj70gZWKYbI706tWS" crossorigin="anonymous">
   <title>TinyApp</title>
+  <style>
+      /* <!-- Button style  --> */
+  .btn {
+    border: 2px solid black;
+    background-color: white;
+    color: black;
+    padding: 2px 10px;
+    margin-right: 5px;
+    font-size: 12px;
+    cursor: pointer;
+  }
+  
+  /* Delete button blue */
+  .delete {
+    border-color: #04AA6D;
+    color: blue;
+    
+  }
+  
+  .delete:hover {
+    background-color: #04AA6D;
+    color: white;
+  }
+
+  </style>
+
 </head>
 <body>
-
+  
   <%- include('./partials/_header.ejs') %>
   <form method="POST" action="/urls/9sm5xK/delete">...</form>
-  
+
   <main style="margin: 1em;">
     <h3>My URLs</h3>
     <table class="table">
@@ -26,8 +52,10 @@
         <% for(let url in urls) { %>
           <tr>
             <td><%= url %></td>
-            <td><%= urls[url] %></td>
-          </tr>
+            <td><%= urls[url] %>     
+              <button class="btn delete" style="margin-left: 10px;">Delete</button></td>
+            
+            </tr>
         <% } %>
       </tbody>
     </table>
