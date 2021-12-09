@@ -70,9 +70,14 @@
         <% for(let url in urls) { %>
           <tr>
             <td><%= url %></td>
-            <td><%= urls[url] %> </td>    
-              <td><button class="btn edit" style="margin-left: 10px;">Edit</button>
-              <button class="btn delete" style="margin-left: 30px;">Delete</button></td>
+            <td><%= urls[url] %> </td>  
+              <td>
+              <form action="/urls/<%= url %>/" method="GET">
+                
+                <button class="btn edit" type="submit" style="margin-left: 10px;">Edit</button></form>
+              <form action="/urls/<%= url %>/delete" method="POST">
+
+              <button class="btn delete" type="submit" style="margin-left: 30px;">Delete</button></form></td>
             
             </tr>
         <% } %>

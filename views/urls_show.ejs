@@ -47,12 +47,12 @@
 
       <div>
       <!-- new form for edit and New URL  -->
-      <h5 class="car-title1">Edit</h5>
-      <p>New URL: <input type="text" id="newUrl" name="newUrl" placeholder="http://"><button class="btn edit" style="margin-left: 10px;">Submit</button>
-      </p> 
-      </div>  
 
-  
+      <h5 class="car-title1">Edit</h5>
+      <form action="/urls/<%= shortURL %>/edit" method="POST">
+      <p>New URL: <input type="text" id="newUrl" name="newUrl" placeholder="http://"><button class="btn edit" style="margin-left: 10px;" type="submit">Submit</button>
+      </p> </form>
+      </div>  
   </div>
   <!-- Bootstrap JS -->
   <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
