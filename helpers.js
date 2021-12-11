@@ -10,5 +10,18 @@ const urlsForUser = (id, database) => {
 
   return userUrls;
 };
+// generateRandomString is function for create a new or check a existing email . 
+
+const generateRandomString = () => {
+  const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+  let randomString = '';
+  
+  while (randomString.length < 6) {
+    randomString += chars[Math.floor(Math.random() * chars.length)];
+  }
+
+  return randomString;
+};
+
 
 module.exports = { urlsForUser };
