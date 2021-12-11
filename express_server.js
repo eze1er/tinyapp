@@ -20,7 +20,7 @@ app.use(bodyParser.urlencoded({extended: true}));
 app.set("view engine", "ejs");
 
 // functions
-const { urlsForUser } = require('.helpers');
+const { urlsForUser } = require('./helpers');
 
 /////////////////////
 
@@ -43,7 +43,8 @@ ROUTING
 // root - GET
 // Redirects to /urls if logged in, or to /login
 
-app.get("/", (req, res) => {
+app.get('/', (req, res) => {
+  const userID = req.session.userID;
   if (req.session.userID) {
     res.redirect('/urls');
   } else {
@@ -65,48 +66,83 @@ app.get("/urls", (req, res) => {
   res.render("urls_index", templateVars);
 });
 
- // **************** 
- 
-app.get("/hello", (req, res) => {
-  const templateVars = { greeting: 'Hello World!' };
-  res.render("hello_world", templateVars);
-});
+ // new url creation - POST 
+ // adds new url to DB, redirects to short url page
+app.post('/urls', (req, res) => {
+  if (req.session.userID) {
+    const shortURL = generateRandomString();
+    urlDatabase[shortURL] = {
+      longURL: req.body.longURL,
+      userID: req.session.userID
+    };
+    res.redirect(`/urls/${shortURL}`);
+  } else {
+    const errorMessage = 'You must be logged in to that.';
+    res.status(401).render('urls_error', {user: users[req.session.userID], errorMessage});
+  }
+})
+
+// Creation new url page - GET
+// Validates if it new or already exist. if it is inn the DB displaying page
 
 app.get("/urls/new", (req, res) => {
-  res.render("urls_new");
-});
-
-app.get("/urls/:shortURL", (req, res) => {
-  const templateVars = { shortURL: req.params.shortURL, longURL:urlDatabase[req.params.shortURL]};
-  res.render("urls_show", templateVars);
-});
-
-// generated the short url
-
-const generateRandomString = function() {
-  let randomString = "";
-  for (let i = 0; i < 6; i++) {
-    const randomCharCode = Math.floor(Math.random() * 26 + 97);
-    const randomChar = String.fromCharCode(randomCharCode);
-    randomString += randomChar;
+  if (req.session.userID) {
+    const templateVars = {user: users[req.session.userID]};
+    res.render('urls_new', templateVars);
+  } else {
+    res.redirect('/login');
   }
-  return randomString;
-};
+});
 
-app.post("/urls" , (req, res)  => {
-  const shortURL = generateRandomString();
-  const longURL = req.body.longURL;
-  urlDatabase[shortURL] = longURL;
-  res.redirect(`/urls/${shortURL}`);
-  // res.redirect(`/urls/${shortURL}`);
-});
-// Delete longURL when delete button is submitted
-app.post("/urls/:shortURL/delete", (req, res) => {
+// short url page - GET
+// show details about the url if it belongs to user
+app.get("/urls/:shortURL", (req, res) => {
   const shortURL = req.params.shortURL;
-  delete urlDatabase[shortURL];
-  res.redirect(`/urls`);
+  const userID = req.session.userID;
+  const userUrls = urlsForUser(userID, urlDatabase);
+  const templateVars = { urlDatabase, userUrls, shortURL, user: users[userID] };
+  res.render("urls_show", templateVars);
+
+  if (!urlDatabase[shortURL]) {
+    const errorMessage = "This short URL doesn't exist."
+    res.status(404).render('urls_error', {user: users[userID], errorMessage}); 
+  } else {
+    if (!userID || !userUrls[shortURL]) {
+      const errorMessage = 'You are not authorized to see this URL.';
+      rs.status(401).render('urls_error', {user: users[userID], errorMessage});
+    } else {
+      res.render('urls_show', templateVars);
+    }
+  }
 });
-//  from this point
+// url edit - POST
+// updates longURL if url belongs to user
+app.post('/urls/:shortURL', (req, res) => {
+  const shortURL = req.params.shortURL;
+
+  if (req.session.userID  && req.session.userID === urlDatabase[shortURL].userID) {
+    urlDatabase[shortURL].longURL = req.body.updatedURL;
+    res.redirect(`/urls`);
+  } else {
+    const errorMessage = 'You are not authorized to do that.';
+    res.status(401).render('urls_error', {user: users[req.session.userID], errorMessage});
+  }
+})
+
+
+// delete url - POST
+// deletes url from database if it belongs to user
+app.post('/urls/:shortURL/delete', (req, res) => {
+  const shortURL = req.params.shortURL;
+
+  if (req.session.userID  && req.session.userID === urlDatabase[shortURL].userID) {
+    delete urlDatabase[shortURL];
+    res.redirect('/urls');
+  } else {
+    const errorMessage = 'You are not authorized to do that.';
+    res.status(401).render('urls_error', {user: users[req.session.userID], errorMessage});
+  }
+});
 
 
 app.listen(PORT, () => {

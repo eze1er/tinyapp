@@ -24,4 +24,4 @@ const generateRandomString = () => {
 };
 
 
-module.exports = { urlsForUser };
+module.exports = { urlsForUser, generateRandomString };
