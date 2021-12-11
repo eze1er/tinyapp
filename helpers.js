@@ -23,5 +23,15 @@ const generateRandomString = () => {
   return randomString;
 };
 
+// email check 
 
-module.exports = { urlsForUser, generateRandomString };
+const getUserByEmail = (email, database) => {
+  for (const user in database) {
+    if (database[user].email === email) {
+      return database[user];
+    }
+  }
+  return undefined;
+};
+
+module.exports = { urlsForUser, generateRandomString, getUserByEmail };

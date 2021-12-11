@@ -48,7 +48,7 @@ ROUTING
 // Redirects to /urls if logged in, or to /login
 
 app.get('/', (req, res) => {
-  const userID = req.session.userID;
+  // const userID = req.session.userID;
   if (req.session.userID) {
     res.redirect('/urls');
   } else {
@@ -185,6 +185,52 @@ app.post('/login', (req, res) => {
   }
 });
 
+
+// logging out - POST
+// clears cookies and redirects to urls index page
+app.post('/logout', (req, res) => {
+  res.clearCookie('session');
+  res.clearCookie('session.sig');
+  res.redirect('/urls');
+});
+
+// registration page - GET
+// redirects to urls index page if already logged in
+app.get('/register', (req, res) => {
+  if (req.session.userID) {
+    res.redirect('/urls');
+    return;
+  }
+  const templateVars = {user: users[req.session.userID]};
+  res.render('urls_registration', templateVars);
+});
+
+// registering - POST
+// redirects to urls index page if credentials are valid
+app.post('/register', (req, res) => {
+  if (req.body.email && req.body.password) {
+
+    if (!getUserByEmail(req.body.email, users)) {
+      const userID = generateRandomString();
+      users[userID] = {
+        userID,
+        email: req.body.email,
+        password: bcrypt.hashSync(req.body.password, 10)
+      };
+      req.session.userID = userID;
+      res.redirect('/urls');
+    } else {
+      const errorMessage = 'Cannot create new account, because this email address is already registered.';
+      res.status(400).render('urls_error', {user: users[req.session.userID], errorMessage});
+    }
+
+  } else {
+    const errorMessage = 'Empty username or password. Please make sure you fill out both fields.';
+    res.status(400).render('urls_error', {user: users[req.session.userID], errorMessage});
+  }
+});
+
+// server connection 
 
 app.listen(PORT, () => {
   console.log(`Example app listening on port ${PORT}!`);
