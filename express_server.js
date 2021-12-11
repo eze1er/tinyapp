@@ -16,11 +16,15 @@ const { text } = require("body-parser");
 const { application } = require("express")
 app.use(bodyParser.urlencoded({extended: true}));
 
+const cookieSession = require('cookie-session');
+app.use(cookieSession({name: 'session', secret: 'grey-rose-juggling-volcanoes'}));
+
+const bcrypt = require('bcryptjs');
 
 app.set("view engine", "ejs");
 
 // functions
-const { urlsForUser } = require('./helpers');
+const { getUserByEmail, generateRandomString, urlsForUser } = require('./helpers');
 
 /////////////////////
 
@@ -54,7 +58,7 @@ app.get('/', (req, res) => {
 
 // urls index page - GET
 // show urls that belong to the user, if they are logged in
-// must use urslforUser function
+// must use urlsforUser function
 app.get("/urls", (req, res) => {
   const userID = req.session.userID;
   const userUrls = urlsForUser(userID, urlDatabase);
@@ -140,6 +144,43 @@ app.post('/urls/:shortURL/delete', (req, res) => {
     res.redirect('/urls');
   } else {
     const errorMessage = 'You are not authorized to do that.';
+    res.status(401).render('urls_error', {user: users[req.session.userID], errorMessage});
+  }
+});
+
+// redirecting - GET
+// redirects to the long (actual) url
+app.get('/u/:shortURL', (req, res) => {
+  if (urlDatabase[req.params.shortURL]) {
+    res.redirect(urlDatabase[req.params.shortURL].longURL);
+  } else {
+    const errorMessage = 'This short URL does not exist.';
+    res.status(404).render('urls_error', {user: users[req.session.userID], errorMessage});
+  }
+});
+
+// login page - GET
+// redirects to urls index page if already logged in
+app.get('/login', (req, res) => {
+  if (req.session.userID) {
+    res.redirect('/urls');
+    return;
+  }
+
+  const templateVars = {user: users[req.session.userID]};
+  res.render('urls_login', templateVars);
+});
+
+// logging in - POST
+// redirects to urls index page if credentials are valid
+app.post('/login', (req, res) => {
+  const user = getUserByEmail(req.body.email, users);
+
+  if (user && bcrypt.compareSync(req.body.password, user.password)) {
+    req.session.userID = user.userID;
+    res.redirect('/urls');
+  } else {
+    const errorMessage = 'Login credentials not valid. Please make sure you enter the correct username and password.';
     res.status(401).render('urls_error', {user: users[req.session.userID], errorMessage});
   }
 });
