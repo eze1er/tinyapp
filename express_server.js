@@ -20,6 +20,8 @@ const cookieSession = require('cookie-session');
 app.use(cookieSession({name: 'session', secret: 'grey-rose-juggling-volcanoes'}));
 
 const bcrypt = require('bcryptjs');
+const password = "purple-monkey-dinosaur"; // found in the req.params object
+const hashedPassword = bcrypt.hashSync(password, 10);
 
 app.set("view engine", "ejs");
 
@@ -28,16 +30,10 @@ const { getUserByEmail, generateRandomString, urlsForUser } = require('./helpers
 
 /////////////////////
 
-// const urlDatabase = {
-//   "b2xVn2": "http://www.lighthouselabs.ca",
-//   "9sm5xK": "http://www.google.com"
-// };
-
 // variables
 
 const urlDatabase = {};
 const users = {};
-
 
 ///////////////////////////////////////////
 /*
@@ -105,18 +101,16 @@ app.get("/urls/:shortURL", (req, res) => {
   const userID = req.session.userID;
   const userUrls = urlsForUser(userID, urlDatabase);
   const templateVars = { urlDatabase, userUrls, shortURL, user: users[userID] };
-  res.render("urls_show", templateVars);
+  // res.render("urls_show", templateVars);
 
   if (!urlDatabase[shortURL]) {
     const errorMessage = "This short URL doesn't exist."
     res.status(404).render('urls_error', {user: users[userID], errorMessage}); 
-  } else {
-    if (!userID || !userUrls[shortURL]) {
+  } else if (!userID || !userUrls[shortURL]) {
       const errorMessage = 'You are not authorized to see this URL.';
       rs.status(401).render('urls_error', {user: users[userID], errorMessage});
-    } else {
+  } else {
       res.render('urls_show', templateVars);
-    }
   }
 });
 // url edit - POST

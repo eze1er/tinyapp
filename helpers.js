@@ -19,7 +19,6 @@ const generateRandomString = () => {
   while (randomString.length < 6) {
     randomString += chars[Math.floor(Math.random() * chars.length)];
   }
-
   return randomString;
 };
 
@@ -31,7 +30,7 @@ const getUserByEmail = (email, database) => {
       return database[user];
     }
   }
-  return undefined;
+  return null;
 };
 
 module.exports = { urlsForUser, generateRandomString, getUserByEmail };
